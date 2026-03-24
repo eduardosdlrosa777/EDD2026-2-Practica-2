@@ -39,7 +39,7 @@ public class ListaDoblementeLigada<T> implements Listable<T> {
         Nodo nuevo = new Nodo(elem);
 
         if(estaVacio()){
-            cabeza = cola= nuevo;
+            cabeza = cola = nuevo;
         } else{
             cola.siguiente = nuevo;
             nuevo.anterior = cola;
@@ -48,58 +48,79 @@ public class ListaDoblementeLigada<T> implements Listable<T> {
 
         tamaño++;
     }
-
-    /**
-     * Método para agregar un elemento por indice
-     * 
-     * @param T elemento por agregar
-     * @param int i indice donde se va a colocar
-     */
-    public void agregar(int indice, T elem){
-        if(indice <0 || indice > tamaño){
-            throw new IndexOutOfBoundsException();
+    
+    public void agregar(int indice, T elem) {
+	if (indice < 0 || indice > tamaño) {
+	    throw new IndexOutOfBoundsException();
+	}
+	
+	if (indice == tamaño) {
+	    agregar(elem);
+        return;
+	}
+	
+	Nodo nuevo = new Nodo(elem);
+	
+	if (indice == 0) {
+        if (estaVacio()) {
+            cabeza = cola = nuevo;
+        } else {
+            nuevo.siguiente = cabeza;
+            cabeza.anterior = nuevo;
+            cabeza = nuevo;
         }
-
-        Nodo nuevo = new Nodo(elem);
-
-        //Inicio
-        if(indice == 0){
-            if(estaVacio()){
-                cabeza = cola = nuevo;
-            }else{
-                nuevo.siguiente = cabeza;
-                cabeza.anterior = nuevo;
-                cabeza = nuevo;
+	} else {
+	    Nodo actual;
+	    if (indice < tamaño / 2) {
+		actual = cabeza;
+		for (int i = 0; i < indice; i++) {
+		    actual = actual.siguiente;
             }
-        }else if (indice == tamaño) {
-            agregar(elem);
-            return;
-        }else{
-
-            Nodo actual;
-            if(indice < tamaño/2){
-                actual = cabeza;
-                for(int i = 0; i < indice; i++){
-                    actual = actual.siguiente;
-                }
-            }else{
-                actual = cola;
-                for(int i = tamaño-1; i > indice; i--){
-                    actual = actual.anterior;
-                }
+	    } else {
+		actual = cola;
+		for (int i = tamaño - 1; i > indice; i--) {
+		    actual = actual.anterior;
             }
-
-            nuevo.anterior = actual.anterior;
-            nuevo.siguiente = actual;
-
-            actual.anterior.siguiente = nuevo;
-            actual.anterior = nuevo;
-        }
-
-        tamaño++;
+	    }
+	    nuevo.anterior = actual.anterior;
+	    nuevo.siguiente = actual;
+	    actual.anterior.siguiente = nuevo;
+	    actual.anterior = nuevo;
+	}
+	tamaño++; 
     }
 
+    @Override
+    public T obtenerDato(int i) {
+	if (i < 0 || i > tamaño) {
+	    throw new IndexOutOfBoundsException();
+	}
+	
+	Nodo actual = cabeza;
+	int j = 0;
 
+        while(actual != null){
+            if(j == i) {
+                return actual.dato;
+            }
+            actual = actual.siguiente;
+	    j++;
+        }
+	return null;
+    }
+    
+    @Override
+    public int longitudLista() {
+	Nodo actual = cabeza;
+	int longitud = 0;
+
+        while(actual != null){
+            longitud++;
+            actual = actual.siguiente;
+        }
+	this.tamaño = longitud;
+	return longitud; 
+    }
 
     @Override
     public boolean contiene(T elem){
@@ -136,6 +157,15 @@ public class ListaDoblementeLigada<T> implements Listable<T> {
     }
 
     @Override
+    public T ultimoElemento(){
+	if(estaVacio()){
+            throw new NoSuchElementException();
+        }
+
+        return cola.dato;
+    }
+	
+    @Override
     public void eliminar(T elem){
         Nodo actual = cabeza;
 
@@ -161,6 +191,22 @@ public class ListaDoblementeLigada<T> implements Listable<T> {
         }
     }
 
+    @Override
+    public int regresarIndice(T elem) {
+	Nodo actual = cabeza;
+	int i = 0;
+
+        while(actual != null){
+            if(actual.dato.equals(elem)){
+                return i;
+            }
+            actual = actual.siguiente;
+	    i ++;
+        }
+
+        return -1;
+    }
+	
     @Override
     public Iterator<T> iterador() {
         return new Iterator<T>() {
